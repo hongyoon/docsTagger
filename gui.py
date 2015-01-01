@@ -5,9 +5,10 @@ from operator import truediv
 from folderClass import Folder, photo, video
 import math
 import os
+import vlc
 
 def getMenubar(root):
-	#define menubar
+	#de fine menubar
 	menubar = Menu(root)
 	filemenu = Menu(menubar, tearoff=0)
 	filemenu.add_command(label="New")
@@ -78,6 +79,7 @@ class taggerFrame(Frame):
 		entry_canvas = Canvas(self, width=800, height =500)
 		entry_canvas.grid(column=1, row=1, rowspan = 18)
 		self.entry_canvas = entry_canvas
+		self.canvas_id = entry_canvas.winfo_id()
 
 		#Declare string variable
 		date_strVar = StringVar()
@@ -143,8 +145,6 @@ class taggerFrame(Frame):
 	
 		self.next_button = ttk.Button(self, text="next", width=20, command=self.openNextEntry)
 		self.next_button.grid(row=18, column=3)
-
-
 
 		for child in self.winfo_children(): child.grid_configure(padx=5, pady=5)
 	
@@ -233,14 +233,26 @@ class taggerFrame(Frame):
 
 		#update photo / video canvas 
 		if entryObject.type == 'photo':
+			if 'vlcInstance' in self.__dict__:
+
+				self.player.stop()
+				self.vlcInstance.release()
+				del self.vlcInstance
+
 			global photo
 			photo = ImageTk.PhotoImage(entryObject.thumbnail)
 			item = self.entry_canvas.create_image(0,0, anchor=NW, image=photo)
 			self.entry_canvas.itemconfigure(item, image=photo)
 
 		elif entryObject.type == 'video':
-			pass
+			if not 'vlcInstance' in self.__dict__:
 
+				#initialize vlc for video module
+				self.vlcInstance = vlc.Instance()
+				self.player = self.vlcInstance.media_player_new()
+				self.player.set_hwnd(self.canvas_id)
+			self.player.set_media(entryObject.vlcMedia)
+			self.player.play()
 		else :
 			error('unknown type')
 
@@ -287,6 +299,7 @@ class taggerFrame(Frame):
 
 	def renameFilesInFolder(self):
 		if messagebox.askyesno("Are you sure?", "Do you want to rename files in folder?"):
+			self.Folder.renameEntries()
 			try:
 				self.Folder.renameEntries()
 				if messagebox.askyesno("Another Folder?", "Do you want to tag files in a new folder?"):
@@ -300,6 +313,10 @@ class taggerFrame(Frame):
 
 	def updateLastEntryThenRename(self):
 		#make a target name
+		if 'vlcInstance' in self.__dict__:
+			self.player.stop()
+			self.vlcInstance.release()
+			del self.vlcInstance
 		targetName = self.makeTargetName()
 
 		#assign in target name for the last entry

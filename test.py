@@ -3,12 +3,10 @@ from tkinter import *
 from tkinter import ttk, filedialog
 from random import randint
 from gui import taggerFrame, getMenubar
+import glob
 
 # path = filedialog.askdirectory()
 # print(path)
-
-path = 'C:/Users/hongyoon/Desktop/DOCS/imageTagger/'
-
 
 def runTagger():
 	#Declare empty GUI

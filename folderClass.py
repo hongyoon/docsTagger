@@ -4,6 +4,7 @@ import os.path
 import glob
 import ntpath
 from PIL import Image, ImageTk, ExifTags
+import vlc
 
 class Folder(object):
 	"""class for an Folder"""
@@ -11,7 +12,7 @@ class Folder(object):
 		# dirPath = directory path;
 		self.dirPath = dirPath
 
-		# empty list of enties (obj)
+		# empty list of entries (obj)
 		self.entries = []
 
 		photoExtensions = ["/*.JPG", "/*.PNG", "/*.GIF","/*JPEG"]
@@ -23,7 +24,7 @@ class Folder(object):
 			for photoPath in photoPaths:
 				self.entries.append(photo(photoPath))
 
-		videoExtensions = ["/*.AVI", "/.*.MOV","/.MTS", "./MPEG"]
+		videoExtensions = ["/*.AVI", "/*.MOV","/*.MTS", "/*.MPEG", "/*.WMV"]
 		for extension in videoExtensions:
 			# glob.glob function return list of paths of a chosen extension
 			videoPaths = glob.glob(dirPath + extension)
@@ -41,7 +42,6 @@ class Folder(object):
 			entry.printEntry()
 
 #photo class
-
 class entry(object):
 	def __init__(self, entryPath):
 		dirPath, nameExtension = ntpath.split(entryPath)
@@ -131,3 +131,4 @@ class video(entry):
 	def __init__(self,entryPath):
 		super().__init__(entryPath)
 		self.type = 'video'
+		self.vlcMedia = vlc.Instance().media_new(self.entryPath)
