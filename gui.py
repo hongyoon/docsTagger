@@ -8,7 +8,7 @@ import os
 import vlc
 
 def getMenubar(root):
-	#de fine menubar
+	#define menubar
 	menubar = Menu(root)
 	filemenu = Menu(menubar, tearoff=0)
 	filemenu.add_command(label="New")
